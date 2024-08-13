@@ -16,6 +16,15 @@ Clone the repository or download the m-file. Include the folder it resides in on
 ## Uninstallation
 Delete the m-file, README.md, and License files. If you've cloned from github, you'll need to delete the .git folder too. 
 
+## Release Notes
+v1.0 (Oct 30, 2015)
+Initial Commit
+
+v1.1 (August 13, 2024)
+Adds coercion of objects to struct to improve things it can compare.
+
+
+
 ## License
 See the LICENSE file for details.
 

@@ -6,23 +6,37 @@ function varargout = CompareStructures(S1, S2)
 %    Structure 1, and fields exclusive to Structure 2. 
 %  [Feq, Fneq, FonlyS1, FonlyS2] = CompareStructures(S1,S2) will
 %  additionally return the names of those fields as cell array outputs.
+%
 %  If a category contains no entries it will be an empty cell array. For
 %  example, FonlyS2 = {} if S1=struct('a',1,'b',2) and S2=struct('a',5).
 %
-% Author: Peter O'Regan (peteroregan@gmail.com)
-% Last Revised: Oct 30, 2015
+% v1.1 (Agust 13, 2024)
+% - Will attempt to convert objects to STRUCT to improve utility
+% - Will treat NaN as equal.
+% 
 %
-% Copyright © 2015 Peter R. O'Regan
+% Author: Peter O'Regan (peteroregan@gmail.com)
+% Last Revised: August 13, 2024
+%
+% Copyright © 2015-2024 Peter R. O'Regan
 % See LICENSE at https://github.com/poregan/compare-structures
 %
 
 narginchk(2,2);
 nargoutchk(0,4);
-if ~isstruct(S1) || ~isstruct(S2)
-    error('CompareStructs:BadInputType','One or more arguments is not a structure.');
+
+if isobject(S1)
+    S1 = struct(S1);
+end
+if isobject (S2)
+    S2 = struct(S2);
 end
 
-if isequal(S1,S2)
+if ~isstruct(S1) || ~isstruct(S2)
+    error('CompareStructs:BadInputType','One or more arguments is not a structure or convertible object.');
+end
+
+if isequaln(S1,S2)
     fprintf('The structures are identical.\n');
     if nargout > 0, varargout{1} = fieldnames(S1); end
     return
@@ -35,7 +49,7 @@ match = [];
 nomatch = [];
 
 for i=1:length(fic)
-    if isequal(S1.(fic{i}),S2.(fic{i}))
+    if isequaln(S1.(fic{i}),S2.(fic{i}))
         match(end+1) = i; %#ok<AGROW>
     else
         nomatch(end+1) = i; %#ok<AGROW>
@@ -124,7 +138,7 @@ end
 function str = SizeAsString(elem)
 %Helper function to enumerate the [AxBxC] size style.
 vec = size(elem);
-if numel(vec) == 1
+if isscalar(vec)
     str = ['[' num2str(vec) ']'];
     return
 else
